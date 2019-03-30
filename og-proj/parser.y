@@ -1,136 +1,149 @@
 %{
 #include<stdio.h>
 #include<stdlib.h>
-extern FILE *yyin
+#define YYSTYPE double
+int yylex(); 
+int yyerror(); 
+extern FILE *yyin;  
 
 %}
 
+%token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COL COMMA SC OPB CPB OCB CCB OSB CSB 
+
 %%
 
-chunk : { stat [ `;´ ] } [ laststat [ `;´ ] ]
+CHUNK : OCB STAT OSB SC CSB CCB OSB LASTSTAT OSB SC CSB CSB
       ; 
 
-block : chunk
+BLOCK : CHUNK
       ; 
 
-stat :  varlist `=´ explist 
-     | functioncall 
-     | do block end 
-     | while exp do block end 
-     | repeat block until exp
-     | if exp then block { elseif exp then block } [ else block ] end 
-     | for Name `=´ exp `,´ exp [ `,´ exp ] do block end
-     | for namelist in explist do block end 
-     | function funcname funcbody 
-     | local function Name funcbody 
-     | local namelist [ `=´ explist ] 
+STAT :  VARLIST ASSIGN EXPLIST 
+     | FUNCTIONCALL 
+     | DO BLOCK END 
+     | WHILE EXP DO BLOCK END 
+     | REPEAT BLOCK UNTIL EXP
+     | IF EXP THEN BLOCK OCB ELSEIF EXP THEN BLOCK CCB OSB ELSE BLOCK CSB END 
+     | FOR NAME ASSIGN EXP COMMA EXP OSB COMMA EXP CSB DO BLOCK END
+     | FOR NAMELIST IN EXPLIST DO BLOCK END 
+     | FUNCTION FUNCNAME FUNCBODY 
+     | LOCAL FUNCTION NAME FUNCBODY 
+     | LOCAL NAMELIST OSB ASSIGN EXPLIST CSB 
      ;  
 
-laststat : return [ explist ] 
-         | break
+LASTSTAT : RETURN OSB EXPLIST CSB 
+         | BREAK
          ; 
 
-funcname : Name { `.´ Name } [ `:´ Name ]
+FUNCNAME : NAME OCB DOT NAME CCB OSB COL NAME CSB
          ; 
 
-varlist : var { `,´ var }
+VARLIST : VAR OCB COMMA VAR CCB
         ; 
 
-var :  Name 
-    | prefixexp `[´ exp `]´ 
-    | prefixexp `.´ Name 
+VAR :  NAME 
+    | PREFIXEXP OSB EXP CSB
+    | PREFIXEXP DOT NAME 
     ; 
 
-namelist : Name { `,´ Name }
+NAMELIST : NAME OCB COMMA NAME CCB
          ; 
 
-explist : { exp `,´ } exp
+EXPLIST : OCB EXP COMMA CCB EXP
         ; 
 
-exp :  nil 
-    | false 
-    | true 
-    | Number 
-    | String 
-    | `...´ 
-    | function 
-    | prefixexp 
-    | tableconstructor 
-    | exp binop exp 
-    | unop exp 
+EXP :  NIL 
+    | FALSE 
+    | TRUE 
+    | NUMBER 
+    | STRING 
+    | TDOT 
+    | FUNCTION1
+    | PREFIXEXP 
+    | TABLECONSTRUCTOR 
+    | EXP BINOP EXP 
+    | UNOP EXP 
     ; 
 
-prefixexp : var 
-          | functioncall 
-          | `(´ exp `)´
+PREFIXEXP : VAR 
+          | FUNCTIONCALL 
+          | OPB EXP CPB
           ; 
+FUNCTIONCALL :  PREFIXEXP ARGS 
 
-functioncall :  prefixexp args 
-             | prefixexp `:´ Name args 
+| PREFIXEXP COL NAME ARGS 
              ; 
 
-args :  `(´ [ explist ] `)´ 
-     | tableconstructor 
-     | String 
+ARGS :  OPB OSB EXPLIST CSB CPB
+     | TABLECONSTRUCTOR 
+     | STRING 
     ; 
 
-function : function funcbody
-         ; 
-
-funcbody : `(´ [ parlist ] `)´ block end
-         ; 
-
-parlist : namelist [ `,´ `...´ ] 
-        | `...´
-        ; 
-
-tableconstructor : `{´ [ fieldlist ] `}´
-                 ; 
-
-fieldlist : field { fieldsep field } [ fieldsep ]
+FUNCTION1 : FUNCTION FUNCBODY
           ; 
 
-field : `[´ exp `]´ `=´ exp 
-      | Name `=´ exp 
-      | exp
-      ; 
-
-fieldsep : `,´ 
-         | `;´
+FUNCBODY : OPB OSB PARLIST CSB CPB BLOCK END
          ; 
 
-binop : `+´ 
-      | `-´ 
-      | `*´ 
-      | `/´ 
-      | `^´ 
-      | `%´
-      | `..´ 
-      | `<´ 
-      | `<=´ 
-      | `>´ 
-      | `>=´ 
-      | `==´ 
-      | `~=´ 
-      | and 
-      | or
+PARLIST : NAMELIST OSB COMMA TDOT CSB 
+        | TDOT
+        ; 
+
+TABLECONSTRUCTOR : OCB OSB FIELDLIST CSB CCB
+                 ; 
+
+FIELDLIST : FIELD OCB FIELDSEP FIELD CSB OSB FIELDSEP CSB
+          ; 
+
+FIELD : OSB EXP CSB ASSIGN EXP 
+      | NAME ASSIGN EXP 
+      | EXP
       ; 
 
-unop : `-´ 
-     | not 
-     | `#´
+FIELDSEP : COMMA 
+         | SC
+         ; 
+
+BINOP : PLUS 
+      | MINUS 
+      | TIMES 
+      | DIVIDE 
+      | POWER 
+      | MODULO
+      | APPEND 
+      | LT 
+      | LTE 
+      | GT 
+      | GTE 
+      | EQS 
+      | NEQS 
+      | AND 
+      | OR
+      ; 
+
+UNOP : MINUS 
+     | NOT 
+     | SQUARE
      ; 
 %%
+int yyerror(char *msg)
+{
+    printf("Invalid expression\n");
+    return 1;
+}
+
+
 int main()
 {
- n = fopen("in.txt", "r");
+     yyin = fopen("in.txt", "r");
     do{
-        if(yyparse()){
-               printf("\n Failure");
-               exit(0);
-              }
-          }while(!feof(yyin));
-       printf("success")
-     }
-   }
-}
+        if(yyparse())
+        {
+            printf("\n Failure");
+            exit(0);
+        }
+
+       }while(!feof(yyin));
+    printf("success"); 
+    return 0; 
+ }

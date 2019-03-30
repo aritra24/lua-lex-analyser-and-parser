@@ -1,99 +1,91 @@
-%top{
-    #include "grammar.tab.hh"
-    #include "ops.h"
-	#include "globals.h"
-    #define YY_DECL yy::parser::symbol_type yylex()
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include "parser.tab.h"
+    extern FILE *yyin;  
 
 	int linenr = 0;
+%}
 
-	void log(std::string message, std::string text){
-		if (debug_lex == true)
-			std::cout << message << ": " << text << std::endl;
-	}
-}
-
-%option noyywrap nounput batch noinput
+%option noyywrap nodefault yylineno
 
 %%
 
---\[\[([^\]])*\]\]--					{ log("comment",yytext); }
---[^\n]*								{ log("comment",yytext); }
+--\[\[([^\]])*\]\]--					{printf("comment %s %s",yytext); }
+--[^\n]*								{printf("comment %s",yytext); }
 
 
-do										{ log("do", yytext); return DO; }
-while									{ log("while", yytext); return WHILE }
-for										{ log("for", yytext); return FOR; }
-until									{ log("until", yytext); return UNTIL; }
-repeat									{ log("repeat", yytext); return REPEAT; }
-end										{ log("end", yytext); return END; }
-in										{ log("in", yytext); return IN; }
+"do"										{printf("do %s", yytext); return DO; }
+while									{ printf("while %s", yytext); return WHILE ;}
+for										{printf("for %s", yytext); return FOR; }
+until									{printf("until %s", yytext); return UNTIL; }
+repeat									{printf("repeat %s", yytext); return REPEAT; }
+end										{printf("end %s", yytext); return END; }
+in										{printf("in %s", yytext); return IN; }
 
-if										{ log("if", yytext); return IF; }
-then									{ log("then", yytext); return THEN; }
-elseif									{ log("elseif", yytext); return ELSEIF; }
-else									{ log("else", yytext); return ELSE; }
+if										{printf("if %s", yytext); return IF; }
+then									{printf("then %s", yytext); return THEN; }
+elseif									{printf("elseif %s", yytext); return ELSEIF; }
+else									{printf("else %s", yytext); return ELSE; }
  
 
-[+]                                     { log("binop/+", yytext); return PLUS; }
-[-]                                     { log("binop/-", yytext); return MINUS; }
-[*]                                     { log("binop/*", yytext); return TIMES; }
-[/]                                     { log("binop//", yytext); return DIVIDE; }
-[\^]                                    { log("binop/^", yytext); return POWER; }
-[%]                                     { log("binop/%", yytext); return MODULO; }
-[=][=]                                  { log("binop/==", yytext); return EQUALS; }
-[<]                                     { log("binop/<", yytext); return LESS_THAN; }
-[<][=]                                  { log("binop/<=", yytext); return LESS_EQUAL_THAN; }
-[>]                                     { log("binop/>", yytext); return MORE_THAN; }
-[>][=]                                  { log("binop/>=", yytext); return MORE_EQUAL_THAN; }
-[~][=]                                  { log("binop/~=", yytext); return TILDE_EQUAL; }
-[.][.]                                  { log("binop/..", yytext); return APPEND; }
-and                                     { log("unop/and", yytext); return AND; }
-or                                      { log("unop/or", yytext); return OR; }
-#                                     { log("unop/#", yytext); return SQUARE; }
-not                                     { log("unop/not", yytext); return NOT; }
+[+]                                     {printf("binop/+ %s", yytext); return PLUS; }
+[-]                                     {printf("binop/- %s", yytext); return MINUS; }
+[*]                                     {printf("binop/* %s", yytext); return TIMES; }
+[/]                                     {printf("binop// %s", yytext); return DIVIDE; }
+[\^]                                    {printf("binop/^ %s", yytext); return POWER; }
+[%]                                     {printf("binop/% %s", yytext); return MODULO; }
+[=][=]                                  {printf("binop/== %s", yytext); return EQS; }
+[<]                                     {printf("binop/< %s", yytext); return LT; }
+[<][=]                                  {printf("binop/<= %s", yytext); return LTE; }
+[>]                                     {printf("binop/> %s", yytext); return GT; }
+[>][=]                                  {printf("binop/>= %s", yytext); return GTE; }
+[~][=]                                  {printf("binop/~= %s", yytext); return NEQS; }
+[.][.]                                  {printf("binop/.. %s", yytext); return APPEND; }
+and                                     {printf("unop/and %s", yytext); return AND; }
+or                                      {printf("unop/or %s", yytext); return OR; }
+#                                     {printf("unop/# %s", yytext); return SQUARE; }
+not                                     {printf("unop/not %s", yytext); return NOT; }
 
 
 
-local									{ log("local", yytext); return LOCAL; }
+local									{printf("local %s", yytext); return LOCAL; }
 
 
-function								{ log("function",yytext); return FUNCTION; }
-return									{ log("return",yytext); return RETURN; }
-break									{ log("break",yytext); return BREAK; }
+function								{printf("function %s",yytext); return FUNCTION; }
+return									{printf("return %s",yytext); return RETURN; }
+break									{printf("break %s",yytext); return BREAK; }
 
 
-nil										{ log("nil", yytext); return NIL;}
-false									{ log("false", yytext); return FALSE; }
-true									{ log("true", yytext); return TRUE;}
-[0-9]+									{ log("number",yytext); return NUMBER;}
-\"[^\"]*\"								{ log("string",yytext); return STRING;}
-\.\.\.									{ log("tdot",yytext); return TDOT;}
-[A-Za-z_][A-Za-z0-9_]*					{ log("name",yytext); return NAME; }
+nil										{printf("nil %s", yytext); return NIL;}
+false									{printf("false %s", yytext); return FALSE; }
+true									{printf("true %s", yytext); return TRUE;}
+[0-9]+									{printf("number %s",yytext); return NUMBER;}
+\"[^\"]*\"								{printf("string %s",yytext); return STRING;}
+\.\.\.									{printf("tdot %s",yytext); return TDOT;}
+[A-Za-z_][A-Za-z0-9_]*					{printf("name %s",yytext); return NAME; }
 
 
 
 
-=										{ log("assign",yytext); return ASSIGN; }
-\.										{ log("dot",yytext); return DOT; }
-:										{ log("colon",yytext); return COLON; }
-,										{ log("comma",yytext); return COMMA; }
-;										{ log("semicolon",yytext); return SEMICOLON; }
+=										{printf("assign %s",yytext); return ASSIGN; }
+\.										{printf("dot %s",yytext); return DOT; }
+:										{printf("colon %s",yytext); return COL; }
+,										{printf("comma %s",yytext); return COMMA; }
+;										{printf("semicolon %s",yytext); return SC; }
 
 
-\(										{ log("parentheses_l",yytext); return PARANTHESES_L; }
-\)										{ log("parantheses_r",yytext); return PARANTHESES_R; }
-\{										{ log("braces_l", yytext); return BRACES_L; }
-\}										{ log("braces_r", yytext); return BRACES_R; }
-[\[]									{ log("bracket_l",yytext); return BRACKET_L; }
-[\]]									{ log("bracket_r",yytext); return BRACKET_R; }
+\(										{printf("parentheses_l %s",yytext); return OPB; }
+\)										{printf("parantheses_r %s",yytext); return CPB; }
+\{										{printf("braces_l %s", yytext); return OCB; }
+\}										{printf("braces_r %s", yytext); return CCB; }
+[\[]									{printf("bracket_l %s",yytext); return OSB; }
+[\]]									{printf("bracket_r %s",yytext); return CSB; }
 
 
 [ \t]									{ /* spacing */}
 [\n]									{ linenr++; }
-<<EOF>>                 				{ log("end", ""); return QUIT(); }
 
 %%
-void set_input_file(char* filename)
-{
-	yyin = fopen(filename, "r");
-}
+//<<EOF>>                 				{printf("end %s", ""); return EXIT; }
+
