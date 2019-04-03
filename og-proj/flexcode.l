@@ -88,4 +88,13 @@ true									{printf("true %s", yytext); return TRUE;}
 
 %%
 //<<EOF>>                 				{printf("end %s", ""); return EXIT; }
+void yyerror(const char *str)
+{
+    fprintf(stderr,"Error | Line: %d\n%s\n",yylineno,str); 
+}
+
+int yywrap()
+{
+    return 1; 
+}
 

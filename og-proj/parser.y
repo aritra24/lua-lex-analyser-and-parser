@@ -7,11 +7,12 @@ int yyerror();
 extern FILE *yyin;  
 
 %}
+%define parse.error verbose
+%locations
 
 %token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COL COMMA SC OPB CPB OCB CCB OSB CSB 
 
 %%
-
 CHUNK : OCB STAT OSB SC CSB CCB OSB LASTSTAT OSB SC CSB CSB
       ; 
 
@@ -126,12 +127,13 @@ UNOP : MINUS
      | SQUARE
      ; 
 %%
+/*
 int yyerror(char *msg)
 {
     printf("Invalid expression\n");
     return 1;
 }
-
+*/
 
 int main()
 {
