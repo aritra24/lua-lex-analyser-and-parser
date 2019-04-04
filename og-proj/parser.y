@@ -2,12 +2,16 @@
 #include<stdio.h>
 #include<stdlib.h>
 #define YYSTYPE double
+#define YYDEBUG 1
+#define YYPRINT(file, type, value)	
 int yylex(); 
 int yyerror(); 
 extern FILE *yyin;  
 
 %}
 %define parse.error verbose
+%define parse.lac full
+%define parse.trace
 %locations
 
 %token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COLON COMMA SEMICOLON OPB CPB OCB CCB OSB CSB 
@@ -108,8 +112,9 @@ explist : exp
 		;
 
 prefixexp: var 
-		| functioncall 
+		| functioncall
 		| OPB exp CPB 
+		| OCB explist CCB
 		;
 
 function: FUNCTION funcbody ;
@@ -216,15 +221,15 @@ op_9    : exp
 
 int main()
 {
-     yyin = fopen("in.txt", "r");
+     yyin = fopen("test6.lua", "r");
     do{
         if(yyparse())
         {
-            printf("\n Failure");
+            printf("\nFailure");
             exit(0);
         }
 
        }while(!feof(yyin));
-    printf("success"); 
+    printf("\nSuccess"); 
     return 0; 
  }
