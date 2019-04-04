@@ -80,10 +80,10 @@ int SEARCH(char* str,int scope_counter)
         struct ListElement* cur = TABLE[i];
         while(cur!=NULL)
         {
-            printf("inside search function %s and scope counter %d  \n",str,scope_counter); 
+            //printf("inside search function %s and scope counter %d  \n",str,scope_counter); 
             if(strcmp(cur->t.name,str)==0 && scope_counter==cur->scope_counter)
             {
-                printf("name found %s \n",cur->t.name);
+                //printf("name found %s \n",cur->t.name);
                 return 1; 
 
             }
@@ -96,7 +96,7 @@ int SEARCH(char* str,int scope_counter)
 
 void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int scope_counter)
 {
-    printf("trying to insert %s with scope %c and scope counter %d and type %s \n",tk.name,scope,scope_counter,type); 
+    //printf("trying to insert %s with scope %c and scope counter %d and type %s \n",tk.name,scope,scope_counter,type); 
 
     if(scope=='\0')
     {
@@ -109,7 +109,7 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
     }
     else
     {
-    printf("global \n",tk.name); 
+    //printf("global \n",tk.name); 
     if(SEARCH(tk.name,0)==1) return; 
 
     }
@@ -129,7 +129,7 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
     for(int i=0;i<argcount;i++)
     {
         cur->args[i]=args[i];
-                printf("arg[%d] is %d\n",i,args[i]); 
+                //printf("arg[%d] is %d\n",i,args[i]); 
 
     }
     if(TABLE[val]==NULL)
@@ -156,7 +156,7 @@ int argflag=0;
 
 void insertUtil(Token t)
 {
-    printf("lexeme name is %s and type is %d  \n ",t.name,t.type); 
+    //printf("lexeme name is %s and type is %d  \n ",t.name,t.type); 
     if((t.type==2|| t.type==14) && argflag!=1)
     {
         strcpy(temp.name,t.name); 
@@ -189,12 +189,12 @@ void insertUtil(Token t)
     if(t.type==2 && funcFlag==1)
     {
         //strcpy(args[argcount++],t.name);
-        printf("for func name %s argument found %s \n",temp.name,t.name); 
+        //printf("for func name %s argument found %s \n",temp.name,t.name); 
         if(scope_counter==0)
         args[argcount++]=HASH(t.name,scope_counter); 
         else
         args[argcount++]=HASH(t.name,scope_counter-1); 
-        printf("args[] value is %d \n",args[0]); 
+        //printf("args[] value is %d \n",args[0]); 
     }
     if(strcmp(t.name,")")==0 && funcFlag==1)
     {
