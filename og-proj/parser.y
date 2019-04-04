@@ -23,19 +23,23 @@ block	: chunk
 chunk	: chunk2 laststat 
 		| chunk2 
 		| laststat
+		| error '\n'
 		;
 
 chunk2	: stat optsemi
 	   	| chunk stat optsemi 
+		| error '\n'
 		;
 
 optsemi	: SEMICOLON
 		| 
+		| error '\n'
 		;
 
 laststat: RETURN explist optsemi 
 		| RETURN optsemi 
 		| BREAK optsemi 
+		| error '\n'
 		;
 
 stat	: varlist ASSIGN explist 
@@ -49,52 +53,64 @@ stat	: varlist ASSIGN explist
 		| REPEAT block UNTIL exp 
 		| ifblock 
 		| forblock
+		| error '\n'
 	 	;
 
 forblock: FOR NAME ASSIGN exp COMMA exp DO block END 
 		| FOR NAME ASSIGN exp COMMA exp COMMA exp DO block END 
 		| FOR namelist IN explist DO block END 
+		| error '\n'
 		;
 		
 whileblock: WHILE exp DO block END 
+		| error '\n'
         ;
 
 ifblock	: iflist elsestat END 
+		| error '\n'
 		;
 iflist: ifstat 
 		| iflist elseifstat 
+		| error '\n'
 		;
 
 ifstat: IF exp THEN block 
+		| error '\n'
 		;
 
 elseifstat: ELSEIF exp THEN block 
+		| error '\n'
 		;
 
 elsestat	: ELSE block 
 		| /* empty */
-		
+		| error '\n'
 		;
 
 var		: NAME 
 		| prefixexp OSB exp CSB 
 		| prefixexp DOT NAME 
+		| error '\n'
 	 	;
 
 varlist : var 
 		| varlist COMMA var 
+		| error '\n'
 		;
 
 funcname: funcname2 
 		| funcname2 COLON NAME 
+		| error '\n'
 		;
 
 funcname2: NAME 
 		| funcname2 DOT NAME 
+		| error '\n'
 		;
 
 namelist: NAME 
 		| namelist COMMA NAME 
+		| error '\n'
 		;
 
 exp		: NIL 
@@ -105,64 +121,80 @@ exp		: NIL
 		| function 
 		| prefixexp
 		| op 
+		| error '\n'
 		;
 
 explist : exp
 		| explist COMMA exp 
+		| error '\n'
 		;
 
 prefixexp: var 
 		| functioncall
 		| OPB exp CPB 
 		| OCB explist CCB
+		| error '\n'
 		;
 
 function: FUNCTION funcbody ;
+		| error '\n'
 
 functioncall: prefixexp args
 		| prefixexp COLON NAME args 
+		| error '\n'
 		;
 
 funcbody: OPB parlist CPB block END 
 		| OPB CPB block END 
+		| error '\n'
 		;
 
 parlist	: namelist 
 		| namelist COMMA TDOT 
 		| TDOT 
+		| error '\n'
 		;
 
 args	: OPB CPB 
 		| OPB explist CPB 
         | tableconstructor 
 		| string 
+		| error '\n'
 		;
 
 tableconstructor: OCB fieldlist CCB 
-		| OCB CCB 
+		| OCB CCB
+		| error '\n' 
 		;
 
 field	: OSB exp CSB ASSIGN exp 
 		| NAME ASSIGN exp 
 		| exp 
+		| error '\n'
 	  	;
 
 fieldlist: fieldlist2 optfieldsep 
+		| error '\n'
 		;
 
 fieldlist2: field 
 		| fieldlist2 fieldsep field 
+		| error '\n'
 		;
 optfieldsep: fieldsep 
 		| /* empty */ 
+		| error '\n'
 		;
 
 fieldsep: COMMA 
 		| SEMICOLON 
+		| error '\n'
 		;
 
 string	: STRING 
+		| error '\n'
 		;
+
 
 
 /*
@@ -221,7 +253,7 @@ opnd9: exp
 
 int main()
 {
-     yyin = fopen("in.txt", "r");
+     yyin = fopen("test6.lua", "r");
     do{
         if(yyparse())
         {
