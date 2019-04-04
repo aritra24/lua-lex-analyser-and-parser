@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "parser.tab.h"
+#include "sym_table.h"
     extern FILE *yyin;  
 
 	int linenr = 0;
@@ -11,57 +12,58 @@
 
 %%
 
---\[\[([^\]])*\]\]--					{printf("comment %s",yytext); }
---[^\n]*								{printf("comment %s",yytext); }
+--\[\[([^\]])*\]\]--					{printf("comment %s \n",yytext);}
+--[^\n]*								{printf("comment %s \n",yytext); }
 
-"do"									{printf("do %s", yytext); return DO; }
-while									{ printf("while %s", yytext); return WHILE ;}
-for										{printf("for %s", yytext); return FOR; }
-until									{printf("until %s", yytext); return UNTIL; }
-repeat									{printf("repeat %s", yytext); return REPEAT; }
-end										{printf("end %s", yytext); return END; }
-in										{printf("in %s", yytext); return IN; }
 
-if										{printf("if %s", yytext); return IF; }
-then									{printf("then %s", yytext); return THEN; }
-elseif									{printf("elseif %s", yytext); return ELSEIF; }
-else									{printf("else %s", yytext); return ELSE; }
+"do"										{printf("do %s \n", yytext); insertUtil(newToken(yytext,1)); return DO; }
+while									{ printf("while %s \n", yytext); insertUtil(newToken(yytext,1)); return WHILE ;}
+for										{printf("for %s \n", yytext); insertUtil(newToken(yytext,1)); return FOR; }
+until									{printf("until %s \n", yytext); insertUtil(newToken(yytext,1)); return UNTIL; }
+repeat									{printf("repeat %s \n", yytext); insertUtil(newToken(yytext,1)); return REPEAT; }
+end										{printf(" END%s \n", yytext); insertUtil(newToken(yytext,1)); return END; }
+in										{printf("in %s \n", yytext); insertUtil(newToken(yytext,1)); return IN; }
+if										{printf("if %s \n", yytext); insertUtil(newToken(yytext,1)); return IF; }
+then									{printf("then %s \n", yytext); insertUtil(newToken(yytext,1)); return THEN; }
+elseif									{printf("elseif %s \n", yytext); insertUtil(newToken(yytext,1)); return ELSEIF; }
+else									{printf("else %s \n", yytext); insertUtil(newToken(yytext,1)); return ELSE; }
  
-[+]                                     {printf("binop/+ %s", yytext); return PLUS; }
-[-]                                     {printf("binop/- %s", yytext); return MINUS; }
-[*]                                     {printf("binop/* %s", yytext); return TIMES; }
-[/]                                     {printf("binop// %s", yytext); return DIVIDE; }
-[\^]                                    {printf("binop/^ %s", yytext); return POWER; }
-[%]                                     {printf("binop/ %s", yytext); return MODULO; }
-[=][=]                                  {printf("binop/== %s", yytext); return EQS; }
-[<]                                     {printf("binop/< %s", yytext); return LT; }
-[<][=]                                  {printf("binop/<= %s", yytext); return LTE; }
-[>]                                     {printf("binop/> %s", yytext); return GT; }
-[>][=]                                  {printf("binop/>= %s", yytext); return GTE; }
-[~][=]                                  {printf("binop/~= %s", yytext); return NEQS; }
-[.][.]                                  {printf("binop/.. %s", yytext); return APPEND; }
-and                                     {printf("unop/and %s", yytext); return AND; }
-or                                      {printf("unop/or %s", yytext); return OR; }
-#                                       {printf("unop/# %s", yytext); return SQUARE; }
-not                                     {printf("unop/not %s", yytext); return NOT; }
 
-local									{printf("\nlocal %s", yytext); return LOCAL; }
-
-
-function								{printf("\nfunction %s",yytext); return FUNCTION; }
-return									{printf("\nreturn %s",yytext); return RETURN; }
-break									{printf("\nbreak %s",yytext); return BREAK; }
+[+]                                     {printf("binary operator %s \n", yytext); insertUtil(newToken(yytext,3)); return PLUS; }
+[-]                                     {printf("binary operator%s \n", yytext);  insertUtil(newToken(yytext,3)); return MINUS; }
+[*]                                     {printf("binary operator%s \n", yytext);  insertUtil(newToken(yytext,3)); return TIMES; }
+[/]                                     {printf("binary operator%s \n", yytext);  insertUtil(newToken(yytext,3)); return DIVIDE; }
+[\^]                                    {printf("binary operator%s \n", yytext);  insertUtil(newToken(yytext,3)); return POWER; }
+[%]                                     {printf("binary operator%s \n", yytext);  insertUtil(newToken(yytext,3)); return MODULO; }
+[=][=]                                  {printf("binary operator %s \n", yytext);  insertUtil(newToken(yytext,5)); return EQS; }
+[<]                                     {printf("binary operator%s \n", yytext); insertUtil(newToken(yytext,4)); return LT; }
+[<][=]                                  {printf("binary operator %s \n", yytext); insertUtil(newToken(yytext,4)); return LTE; }
+[>]                                     {printf("binary operator%s \n", yytext); insertUtil(newToken(yytext,4)); return GT; }
+[>][=]                                  {printf("binary operator %s \n", yytext); insertUtil(newToken(yytext,4)); return GTE; }
+[~][=]                                  {printf("binary operator %s \n", yytext); insertUtil(newToken(yytext,5)); return NEQS; }
+[.][.]                                  {printf("binary operator %s \n", yytext); return APPEND; }
+and                                     {printf("unop/and %s \n", yytext); return AND; }
+or                                      {printf("unop/or %s \n", yytext); return OR; }
+#                                     {printf("unop/# %s \n", yytext); return SQUARE; }
+not                                     {printf("unop/not %s \n", yytext); return NOT; }
 
 
-nil										{printf("\nnil %s", yytext); return NIL;}
-false									{printf("\nfalse %s", yytext); return FALSE; }
-true									{printf("\ntrue %s", yytext); return TRUE;}
-[0-9]+									{printf("\nnumber %s",yytext); return NUMBER;}
-\"[^\"]*\"								{printf("\nstring %s",yytext); return STRING;}
-\.\.\.									{printf("\ntdot %s",yytext); return TDOT;}
-[A-Za-z_][A-Za-z0-9_]*					{printf("\nname %s",yytext); return NAME; }
+
+local									{printf("local %s \n", yytext); insertUtil(newToken(yytext,1)); return LOCAL; }
+
+function								{printf("function %s \n",yytext); insertUtil(newToken(yytext,1)); return FUNCTION; }
+return									{printf("return %s \n",yytext); insertUtil(newToken(yytext,1)); return RETURN; }
+break									{printf("break %s \n",yytext); insertUtil(newToken(yytext,1)); return BREAK; }
 
 
+nil										{printf("nil %s \n", yytext); insertUtil(newToken(yytext,1)); return NIL;}
+false									{printf("false %s \n", yytext); insertUtil(newToken(yytext,1)); return FALSE; }
+true									{printf("true %s \n", yytext); insertUtil(newToken(yytext,1)); return TRUE;}
+[0-9]+									{printf("number %s \n",yytext); insertUtil(newToken(yytext,8)); return NUMBER;}
+\"[^\"]*\"								{printf("string %s \n",yytext); insertUtil(newToken(yytext,9)); return STRING;}
+\.\.\.									{printf("tdot %s \n",yytext); return TDOT;}
+[A-Za-z_][A-Za-z0-9_]*					{printf("name %s \n",yytext); insertUtil(newToken(yytext,2)); return NAME; }
+[A-Za-z_][A-Za-z0-9_]*/"("					{printf("name %s \n",yytext); insertUtil(newToken(yytext,14)); return NAME; }
 
 
 =										{printf("\nassign %s",yytext); return ASSIGN; }
@@ -78,11 +80,11 @@ true									{printf("\ntrue %s", yytext); return TRUE;}
 [\[]									{printf("\nopening sqbracket %s",yytext); return OSB; }
 [\]]									{printf("\nclosing sqbracket %s",yytext); return CSB; }
 
-
 [ \t]									{ /* spacing */}
-[\n]									{ linenr++; }
+[\n]									{ linenr++; insertUtil(newToken(yytext,16));}
 
 %%
+//<<EOF>>                 				{printf("end %s \n", ""); return EXIT; }
 void yyerror(const char *str)
 {
     fprintf(stderr,"Error | Line: %d\n%s\n",yylineno,str); 
@@ -93,3 +95,12 @@ int yywrap()
     return 1; 
 }
 
+int main()
+{
+    while(yylex())
+    {
+
+    }
+    printf("Display table\n"); 
+    Display(); 
+}
