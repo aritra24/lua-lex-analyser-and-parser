@@ -1,7 +1,8 @@
 %{
 #include<stdio.h>
 #include<stdlib.h>
-#define YYSTYPE double
+//#include "sym_table.h"
+//#define YYSTYPE double
 #define YYDEBUG 1
 #define YYPRINT(file, type, value)	
 int yylex(); 
@@ -15,7 +16,7 @@ extern FILE *yyin;
 %locations
 
 %token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COLON COMMA SEMICOLON OPB CPB OCB CCB OSB CSB 
-
+%token EXIT 0 "end of file"
 %%
 block	: chunk
 		;
@@ -221,7 +222,7 @@ opnd9: exp
 
 int main()
 {
-     yyin = fopen("in.txt", "r");
+     yyin = fopen("test6.lua", "r");
     do{
         if(yyparse())
         {
@@ -231,5 +232,6 @@ int main()
 
        }while(!feof(yyin));
     printf("\nSuccess"); 
+ //   Display(); 
     return 0; 
  }

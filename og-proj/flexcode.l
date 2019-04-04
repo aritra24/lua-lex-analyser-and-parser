@@ -82,13 +82,14 @@ true									{printf("true %s \n", yytext); insertUtil(newToken(yytext,1)); retu
 
 [ \t]									{ /* spacing */}
 [\n]									{ linenr++; insertUtil(newToken(yytext,16));}
+<<EOF>>                 				{printf("end %s \n", ""); Display(); return EXIT; }
 . {}
 
 %%
-//<<EOF>>                 				{printf("end %s \n", ""); return EXIT; }
 void yyerror(const char *str)
 {
     fprintf(stderr,"Error | Line: %d\n%s\n",yylineno,str); 
+    Display();
 }
 
 int yywrap()
@@ -96,6 +97,7 @@ int yywrap()
     return 1; 
 }
 
+/*
 int main()
 {
     while(yylex())
@@ -105,3 +107,4 @@ int main()
     printf("Display table\n"); 
     Display(); 
 }
+*/
