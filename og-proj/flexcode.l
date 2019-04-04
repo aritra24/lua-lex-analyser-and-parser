@@ -11,39 +11,39 @@
 
 %%
 
---\[\[([^\]])*\]\]--					{printf("comment %s",yytext); }
---[^\n]*								{printf("comment %s",yytext); }
+--\[\[([^\]])*\]\]--					{printf("\ncomment %s",yytext); }
+--[^\n]*								{printf("\ncomment %s",yytext); }
 
-"do"									{printf("do %s", yytext); return DO; }
-while									{ printf("while %s", yytext); return WHILE ;}
-for										{printf("for %s", yytext); return FOR; }
-until									{printf("until %s", yytext); return UNTIL; }
-repeat									{printf("repeat %s", yytext); return REPEAT; }
-end										{printf("end %s", yytext); return END; }
-in										{printf("in %s", yytext); return IN; }
+"do"									{printf("\ndo %s", yytext); return DO; }
+while									{ printf("\nwhile %s", yytext); return WHILE ;}
+for										{printf("\nfor %s", yytext); return FOR; }
+until									{printf("\nuntil %s", yytext); return UNTIL; }
+repeat									{printf("\nrepeat %s", yytext); return REPEAT; }
+end										{printf("\nend %s", yytext); return END; }
+in										{printf("\nin %s", yytext); return IN; }
 
-if										{printf("if %s", yytext); return IF; }
-then									{printf("then %s", yytext); return THEN; }
-elseif									{printf("elseif %s", yytext); return ELSEIF; }
-else									{printf("else %s", yytext); return ELSE; }
- 
-[+]                                     {printf("binop/+ %s", yytext); return PLUS; }
-[-]                                     {printf("binop/- %s", yytext); return MINUS; }
-[*]                                     {printf("binop/* %s", yytext); return TIMES; }
-[/]                                     {printf("binop// %s", yytext); return DIVIDE; }
-[\^]                                    {printf("binop/^ %s", yytext); return POWER; }
-[%]                                     {printf("binop/ %s", yytext); return MODULO; }
-[=][=]                                  {printf("binop/== %s", yytext); return EQS; }
-[<]                                     {printf("binop/< %s", yytext); return LT; }
-[<][=]                                  {printf("binop/<= %s", yytext); return LTE; }
-[>]                                     {printf("binop/> %s", yytext); return GT; }
-[>][=]                                  {printf("binop/>= %s", yytext); return GTE; }
-[~][=]                                  {printf("binop/~= %s", yytext); return NEQS; }
-[.][.]                                  {printf("binop/.. %s", yytext); return APPEND; }
-and                                     {printf("unop/and %s", yytext); return AND; }
-or                                      {printf("unop/or %s", yytext); return OR; }
-#                                       {printf("unop/# %s", yytext); return SQUARE; }
-not                                     {printf("unop/not %s", yytext); return NOT; }
+if										{printf("\nif %s", yytext); return IF; }
+then									{printf("\nthen %s", yytext); return THEN; }
+elseif									{printf("\nelseif %s", yytext); return ELSEIF; }
+else									{printf("\nelse %s", yytext); return ELSE; }
+
+[+]                                     {printf("\nbinary operator %s", yytext); return PLUS; }
+[-]                                     {printf("\nbinary operator %s", yytext); return MINUS; }
+[*]                                     {printf("\nbinary operator %s", yytext); return TIMES; }
+[/]                                     {printf("\nbinary operator %s", yytext); return DIVIDE; }
+[\^]                                    {printf("\nbinary operator %s", yytext); return POWER; }
+[%]                                     {printf("\nbinary operator %s", yytext); return MODULO; }
+[=][=]                                  {printf("\nbinary operator %s", yytext); return EQS; }
+[<]                                     {printf("\nbinary operator %s", yytext); return LT; }
+[<][=]                                  {printf("\nbinary operator %s", yytext); return LTE; }
+[>]                                     {printf("\nbinary operator %s", yytext); return GT; }
+[>][=]                                  {printf("\nbinary operator %s", yytext); return GTE; }
+[~][=]                                  {printf("\nbinary operator %s", yytext); return NEQS; }
+[.][.]                                  {printf("\nbinary operator %s", yytext); return APPEND; }
+and                                     {printf("\nunary operator %s", yytext); return AND; }
+or                                      {printf("\nunary operator %s", yytext); return OR; }
+#                                       {printf("\nunary operator %s", yytext); return SQUARE; }
+not                                     {printf("\nunary operator %s", yytext); return NOT; }
 
 local									{printf("\nlocal %s", yytext); return LOCAL; }
 

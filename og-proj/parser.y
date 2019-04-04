@@ -44,19 +44,19 @@ stat	: varlist ASSIGN explist
 		| FUNCTION funcname funcbody 
 		| LOCAL FUNCTION NAME funcbody
 		| functioncall 
-		| DO BLOCK END 
+		| DO block END 
         | whileblock 
-		| REPEAT BLOCK UNTIL exp 
+		| REPEAT block UNTIL exp 
 		| ifblock 
 		| forblock
 	 	;
 
-forblock: FOR NAME ASSIGN exp COMMA exp DO BLOCK END 
-		| FOR NAME ASSIGN exp COMMA exp COMMA exp DO BLOCK END 
-		| FOR namelist IN explist DO BLOCK END 
+forblock: FOR NAME ASSIGN exp COMMA exp DO block END 
+		| FOR NAME ASSIGN exp COMMA exp COMMA exp DO block END 
+		| FOR namelist IN explist DO block END 
 		;
 		
-whileblock: WHILE exp DO BLOCK END 
+whileblock: WHILE exp DO block END 
         ;
 
 ifblock	: iflist elsestat END 
@@ -65,13 +65,13 @@ iflist: ifstat
 		| iflist elseifstat 
 		;
 
-ifstat: IF exp THEN BLOCK 
+ifstat: IF exp THEN block 
 		;
 
-elseifstat: ELSEIF exp THEN BLOCK 
+elseifstat: ELSEIF exp THEN block 
 		;
 
-elsestat	: ELSE BLOCK 
+elsestat	: ELSE block 
 		| /* empty */
 		
 		;
@@ -123,8 +123,8 @@ functioncall: prefixexp args
 		| prefixexp COLON NAME args 
 		;
 
-funcbody: OPB parlist CPB BLOCK END 
-		| OPB CPB BLOCK END 
+funcbody: OPB parlist CPB block END 
+		| OPB CPB block END 
 		;
 
 parlist	: namelist 
@@ -166,62 +166,62 @@ string	: STRING
 
 
 /*
-    Operator Priority
+    opnd Priority
 */
 
-op      : op_1 
+op: opnd1 
         ;
 
-op_1    : op_1 OR op_2 
-        | op_2 
+opnd1: opnd1 OR opnd2 
+        | opnd2 
         ;
 
-op_2    : op_2 AND op_3 
-        | op_3 
+opnd2: opnd2 AND opnd3 
+        | opnd3 
         ;
 
-op_3    : op_3 LT op_4 
-        | op_3 LTE op_4 
-        | op_3 GT op_4 
-        | op_3 GTE op_4 
-        | op_3 NEQS op_4 
-        | op_3 EQS op_4 
-        | op_4 
+opnd3: opnd3 LT opnd4 
+        | opnd3 LTE opnd4 
+        | opnd3 GT opnd4 
+        | opnd3 GTE opnd4 
+        | opnd3 NEQS opnd4 
+        | opnd3 EQS opnd4 
+        | opnd4 
         ;
 
-op_4    : op_4 APPEND op_5 
-        | op_5 
+opnd4: opnd4 APPEND opnd5 
+        | opnd5 
         ;
 
-op_5    : op_5 PLUS op_6 
-        | op_5 MINUS op_6
-        | op_6 
+opnd5: opnd5 PLUS opnd6 
+        | opnd5 MINUS opnd6
+        | opnd6 
         ;
 
-op_6    : op_6 TIMES op_7 
-        | op_6 DIVIDE op_7
-        | op_6 MODULO op_7
-        | op_7 
+opnd6: opnd6 TIMES opnd7 
+        | opnd6 DIVIDE opnd7
+        | opnd6 MODULO opnd7
+        | opnd7 
         ;
 
-op_7    : NOT op_8 
-        | SQUARE op_8 
-        | MINUS op_8 
-        | op_8 
+opnd7: NOT opnd8 
+        | SQUARE opnd8 
+        | MINUS opnd8 
+        | opnd8 
         ;
 
-op_8    : op_8 POWER op_9 
-        | op_9 
+opnd8: opnd8 POWER opnd9 
+        | opnd9 
         ;
 
-op_9    : exp
+opnd9: exp
         ;
 
 %%
 
 int main()
 {
-     yyin = fopen("test6.lua", "r");
+     yyin = fopen("in.txt", "r");
     do{
         if(yyparse())
         {
