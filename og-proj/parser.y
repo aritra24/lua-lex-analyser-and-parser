@@ -10,130 +10,209 @@ extern FILE *yyin;
 %define parse.error verbose
 %locations
 
-%token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COL COMMA SC OPB CPB OCB CCB OSB CSB 
+%token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COLON COMMA SEMICOLON OPB CPB OCB CCB OSB CSB 
 
 %%
-CHUNK : OCB STAT OSB SC CSB CCB OSB LASTSTAT OSB SC CSB CSB
-      ; 
+BLOCK	: CHUNK
+		;
 
-BLOCK : CHUNK
-      ; 
+CHUNK	: CHUNK2 LASTSTAT 
+		| CHUNK2 
+		| LASTSTAT
+		;
 
-STAT :  VARLIST ASSIGN EXPLIST 
-     | FUNCTIONCALL 
-     | DO BLOCK END 
-     | WHILE EXP DO BLOCK END 
-     | REPEAT BLOCK UNTIL EXP
-     | IF EXP THEN BLOCK OCB ELSEIF EXP THEN BLOCK CCB OSB ELSE BLOCK CSB END 
-     | FOR NAME ASSIGN EXP COMMA EXP OSB COMMA EXP CSB DO BLOCK END
-     | FOR NAMELIST IN EXPLIST DO BLOCK END 
-     | FUNCTION FUNCNAME FUNCBODY 
-     | LOCAL FUNCTION NAME FUNCBODY 
-     | LOCAL NAMELIST OSB ASSIGN EXPLIST CSB 
-     ;  
+CHUNK2	: STAT optsemi
+	   	| CHUNK STAT optsemi 
+		;
 
-LASTSTAT : RETURN OSB EXPLIST CSB 
-         | BREAK
-         ; 
+optsemi	: SEMICOLON
+		| 
+		;
 
-FUNCNAME : NAME OCB DOT NAME CCB OSB COL NAME CSB
-         ; 
+LASTSTAT: RETURN EXPLIST optsemi 
+		| RETURN optsemi 
+		| BREAK optsemi 
+		;
 
-VARLIST : VAR OCB COMMA VAR CCB
-        ; 
+STAT	: VARLIST ASSIGN EXPLIST 
+		| LOCAL NAMELIST ASSIGN EXPLIST 
+		| LOCAL NAMELIST 
+		| FUNCTION funcname funcbody 
+		| LOCAL FUNCTION NAME funcbody
+		| functioncall 
+		| DO BLOCK END 
+        | WHILEBLOCK 
+		| REPEAT BLOCK UNTIL EXP 
+		| IFBLOCK 
+		| forBLOCK
+	 	;
 
-VAR :  NAME 
-    | PREFIXEXP OSB EXP CSB
-    | PREFIXEXP DOT NAME 
-    ; 
+forBLOCK: FOR NAME ASSIGN EXP COMMA EXP DO BLOCK END 
+		| FOR NAME ASSIGN EXP COMMA EXP COMMA EXP DO BLOCK END 
+		| FOR NAMELIST IN EXPLIST DO BLOCK END 
+		;
+		
+WHILEBLOCK: WHILE EXP DO BLOCK END 
+        ;
 
-NAMELIST : NAME OCB COMMA NAME CCB
-         ; 
+IFBLOCK	: IFlist ELSEstat END 
+		;
+IFlist: IFstat 
+		| IFlist ELSEIFstat 
+		;
 
-EXPLIST : OCB EXP COMMA CCB EXP
-        ; 
+IFstat: IF EXP THEN BLOCK 
+		;
 
-EXP :  NIL 
-    | FALSE 
-    | TRUE 
-    | NUMBER 
-    | STRING 
-    | TDOT 
-    | FUNCTION1
-    | PREFIXEXP 
-    | TABLECONSTRUCTOR 
-    | EXP BINOP EXP 
-    | UNOP EXP 
-    ; 
+ELSEIFstat: ELSEIF EXP THEN BLOCK 
+		;
 
-PREFIXEXP : VAR 
-          | FUNCTIONCALL 
-          | OPB EXP CPB
-          ; 
-FUNCTIONCALL :  PREFIXEXP ARGS 
+ELSEstat	: ELSE BLOCK 
+		| /* empty */
+		
+		;
 
-| PREFIXEXP COL NAME ARGS 
-             ; 
+VAR		: NAME 
+		| PREFIXEXP OSB EXP CSB 
+		| PREFIXEXP DOT NAME 
+	 	;
 
-ARGS :  OPB OSB EXPLIST CSB CPB
-     | TABLECONSTRUCTOR 
-     | STRING 
-    ; 
+VARLIST : VAR 
+		| VARLIST COMMA VAR 
+		;
 
-FUNCTION1 : FUNCTION FUNCBODY
-          ; 
+funcname: funcname2 
+		| funcname2 COLON NAME 
+		;
 
-FUNCBODY : OPB OSB PARLIST CSB CPB BLOCK END
-         ; 
+funcname2: NAME 
+		| funcname2 DOT NAME 
+		;
 
-PARLIST : NAMELIST OSB COMMA TDOT CSB 
-        | TDOT
-        ; 
+NAMELIST: NAME 
+		| NAMELIST COMMA NAME 
+		;
 
-TABLECONSTRUCTOR : OCB OSB FIELDLIST CSB CCB
-                 ; 
+EXP		: NIL 
+	 	| FALSE
+		| TRUE 
+		| NUMBER
+		| string
+		| function 
+		| PREFIXEXP
+		| op 
+		;
 
-FIELDLIST : FIELD OCB FIELDSEP FIELD CSB OSB FIELDSEP CSB
-          ; 
+EXPLIST : EXP
+		| EXPLIST COMMA EXP 
+		;
 
-FIELD : OSB EXP CSB ASSIGN EXP 
-      | NAME ASSIGN EXP 
-      | EXP
-      ; 
+PREFIXEXP: VAR 
+		| functioncall 
+		| OPB EXP CPB 
+		;
 
-FIELDSEP : COMMA 
-         | SC
-         ; 
+function: FUNCTION funcbody ;
 
-BINOP : PLUS 
-      | MINUS 
-      | TIMES 
-      | DIVIDE 
-      | POWER 
-      | MODULO
-      | APPEND 
-      | LT 
-      | LTE 
-      | GT 
-      | GTE 
-      | EQS 
-      | NEQS 
-      | AND 
-      | OR
-      ; 
+functioncall: PREFIXEXP args
+		| PREFIXEXP COLON NAME args 
+		;
 
-UNOP : MINUS 
-     | NOT 
-     | SQUARE
-     ; 
-%%
+funcbody: OPB parlist CPB BLOCK END 
+		| OPB CPB BLOCK END 
+		;
+
+parlist	: NAMELIST 
+		| NAMELIST COMMA TDOT 
+		| TDOT 
+		;
+
+args	: OPB CPB 
+		| OPB EXPLIST CPB 
+        | tableconstructor 
+		| string 
+		;
+
+tableconstructor: OCB fieldlist CCB 
+		| OCB CCB 
+		;
+
+field	: OSB EXP CSB ASSIGN EXP 
+		| NAME ASSIGN EXP 
+		| EXP 
+	  	;
+
+fieldlist: fieldlist2 optfieldsep 
+		;
+
+fieldlist2: field 
+		| fieldlist2 fieldsep field 
+		;
+optfieldsep: fieldsep 
+		| /* empty */ 
+		;
+
+fieldsep: COMMA 
+		| SEMICOLON 
+		;
+
+string	: STRING 
+		;
+
+
 /*
-int yyerror(char *msg)
-{
-    printf("Invalid expression\n");
-    return 1;
-}
+    Operator Priority
 */
+
+op      : op_1 
+        ;
+
+op_1    : op_1 OR op_2 
+        | op_2 
+        ;
+
+op_2    : op_2 AND op_3 
+        | op_3 
+        ;
+
+op_3    : op_3 LT op_4 
+        | op_3 LTE op_4 
+        | op_3 GT op_4 
+        | op_3 GTE op_4 
+        | op_3 NEQS op_4 
+        | op_3 EQS op_4 
+        | op_4 
+        ;
+
+op_4    : op_4 APPEND op_5 
+        | op_5 
+        ;
+
+op_5    : op_5 PLUS op_6 
+        | op_5 MINUS op_6
+        | op_6 
+        ;
+
+op_6    : op_6 TIMES op_7 
+        | op_6 DIVIDE op_7
+        | op_6 MODULO op_7
+        | op_7 
+        ;
+
+op_7    : NOT op_8 
+        | SQUARE op_8 
+        | MINUS op_8 
+        | op_8 
+        ;
+
+op_8    : op_8 POWER op_9 
+        | op_9 
+        ;
+
+op_9    : EXP
+        ;
+
+%%
 
 int main()
 {

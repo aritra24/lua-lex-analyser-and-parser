@@ -7,11 +7,11 @@
 	int linenr = 0;
 %}
 
-%option noyywrap nodefault yylineno
+%option nodefault yylineno
 
 %%
 
---\[\[([^\]])*\]\]--					{printf("comment %s %s",yytext); }
+--\[\[([^\]])*\]\]--					{printf("comment %s",yytext); }
 --[^\n]*								{printf("comment %s",yytext); }
 
 
@@ -34,7 +34,7 @@ else									{printf("else %s", yytext); return ELSE; }
 [*]                                     {printf("binop/* %s", yytext); return TIMES; }
 [/]                                     {printf("binop// %s", yytext); return DIVIDE; }
 [\^]                                    {printf("binop/^ %s", yytext); return POWER; }
-[%]                                     {printf("binop/% %s", yytext); return MODULO; }
+[%]                                     {printf("binop/ %s", yytext); return MODULO; }
 [=][=]                                  {printf("binop/== %s", yytext); return EQS; }
 [<]                                     {printf("binop/< %s", yytext); return LT; }
 [<][=]                                  {printf("binop/<= %s", yytext); return LTE; }
@@ -70,9 +70,9 @@ true									{printf("true %s", yytext); return TRUE;}
 
 =										{printf("assign %s",yytext); return ASSIGN; }
 \.										{printf("dot %s",yytext); return DOT; }
-:										{printf("colon %s",yytext); return COL; }
+:										{printf("colon %s",yytext); return COLON; }
 ,										{printf("comma %s",yytext); return COMMA; }
-;										{printf("semicolon %s",yytext); return SC; }
+;										{printf("semicolon %s",yytext); return SEMICOLON; }
 
 
 \(										{printf("parentheses_l %s",yytext); return OPB; }
