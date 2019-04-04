@@ -15,7 +15,7 @@
 --[^\n]*								{printf("comment %s",yytext); }
 
 
-"do"										{printf("do %s", yytext); return DO; }
+"do"									{printf("do %s", yytext); return DO; }
 while									{ printf("while %s", yytext); return WHILE ;}
 for										{printf("for %s", yytext); return FOR; }
 until									{printf("until %s", yytext); return UNTIL; }
@@ -44,7 +44,7 @@ else									{printf("else %s", yytext); return ELSE; }
 [.][.]                                  {printf("binop/.. %s", yytext); return APPEND; }
 and                                     {printf("unop/and %s", yytext); return AND; }
 or                                      {printf("unop/or %s", yytext); return OR; }
-#                                     {printf("unop/# %s", yytext); return SQUARE; }
+#                                       {printf("unop/# %s", yytext); return SQUARE; }
 not                                     {printf("unop/not %s", yytext); return NOT; }
 
 
@@ -87,7 +87,7 @@ true									{printf("true %s", yytext); return TRUE;}
 [\n]									{ linenr++; }
 
 %%
-//<<EOF>>                 				{printf("end %s", ""); return EXIT; }
+
 void yyerror(const char *str)
 {
     fprintf(stderr,"Error | Line: %d\n%s\n",yylineno,str); 

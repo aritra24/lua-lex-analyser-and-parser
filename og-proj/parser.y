@@ -13,72 +13,72 @@ extern FILE *yyin;
 %token DO WHILE FOR REPEAT UNTIL IN END IF THEN ELSE ELSEIF PLUS MINUS TIMES DIVIDE POWER MODULO LT LTE GT GTE ASSIGN NEQS EQS AND APPEND SQUARE NOT OR LOCAL FUNCTION RETURN BREAK NIL FALSE TRUE NUMBER STRING TDOT NAME DOT COLON COMMA SEMICOLON OPB CPB OCB CCB OSB CSB 
 
 %%
-BLOCK	: CHUNK
+block	: chunk
 		;
 
-CHUNK	: CHUNK2 LASTSTAT 
-		| CHUNK2 
-		| LASTSTAT
+chunk	: chunk2 laststat 
+		| chunk2 
+		| laststat
 		;
 
-CHUNK2	: STAT optsemi
-	   	| CHUNK STAT optsemi 
+chunk2	: stat optsemi
+	   	| chunk stat optsemi 
 		;
 
 optsemi	: SEMICOLON
 		| 
 		;
 
-LASTSTAT: RETURN EXPLIST optsemi 
+laststat: RETURN explist optsemi 
 		| RETURN optsemi 
 		| BREAK optsemi 
 		;
 
-STAT	: VARLIST ASSIGN EXPLIST 
-		| LOCAL NAMELIST ASSIGN EXPLIST 
-		| LOCAL NAMELIST 
+stat	: varlist ASSIGN explist 
+		| LOCAL namelist ASSIGN explist 
+		| LOCAL namelist 
 		| FUNCTION funcname funcbody 
 		| LOCAL FUNCTION NAME funcbody
 		| functioncall 
 		| DO BLOCK END 
-        | WHILEBLOCK 
-		| REPEAT BLOCK UNTIL EXP 
-		| IFBLOCK 
-		| forBLOCK
+        | whileblock 
+		| REPEAT BLOCK UNTIL exp 
+		| ifblock 
+		| forblock
 	 	;
 
-forBLOCK: FOR NAME ASSIGN EXP COMMA EXP DO BLOCK END 
-		| FOR NAME ASSIGN EXP COMMA EXP COMMA EXP DO BLOCK END 
-		| FOR NAMELIST IN EXPLIST DO BLOCK END 
+forblock: FOR NAME ASSIGN exp COMMA exp DO BLOCK END 
+		| FOR NAME ASSIGN exp COMMA exp COMMA exp DO BLOCK END 
+		| FOR namelist IN explist DO BLOCK END 
 		;
 		
-WHILEBLOCK: WHILE EXP DO BLOCK END 
+whileblock: WHILE exp DO BLOCK END 
         ;
 
-IFBLOCK	: IFlist ELSEstat END 
+ifblock	: iflist elsestat END 
 		;
-IFlist: IFstat 
-		| IFlist ELSEIFstat 
-		;
-
-IFstat: IF EXP THEN BLOCK 
+iflist: ifstat 
+		| iflist elseifstat 
 		;
 
-ELSEIFstat: ELSEIF EXP THEN BLOCK 
+ifstat: IF exp THEN BLOCK 
 		;
 
-ELSEstat	: ELSE BLOCK 
+elseifstat: ELSEIF exp THEN BLOCK 
+		;
+
+elsestat	: ELSE BLOCK 
 		| /* empty */
 		
 		;
 
-VAR		: NAME 
-		| PREFIXEXP OSB EXP CSB 
-		| PREFIXEXP DOT NAME 
+var		: NAME 
+		| prefixexp OSB exp CSB 
+		| prefixexp DOT NAME 
 	 	;
 
-VARLIST : VAR 
-		| VARLIST COMMA VAR 
+varlist : var 
+		| varlist COMMA var 
 		;
 
 funcname: funcname2 
@@ -89,46 +89,46 @@ funcname2: NAME
 		| funcname2 DOT NAME 
 		;
 
-NAMELIST: NAME 
-		| NAMELIST COMMA NAME 
+namelist: NAME 
+		| namelist COMMA NAME 
 		;
 
-EXP		: NIL 
+exp		: NIL 
 	 	| FALSE
 		| TRUE 
 		| NUMBER
 		| string
 		| function 
-		| PREFIXEXP
+		| prefixexp
 		| op 
 		;
 
-EXPLIST : EXP
-		| EXPLIST COMMA EXP 
+explist : exp
+		| explist COMMA exp 
 		;
 
-PREFIXEXP: VAR 
+prefixexp: var 
 		| functioncall 
-		| OPB EXP CPB 
+		| OPB exp CPB 
 		;
 
 function: FUNCTION funcbody ;
 
-functioncall: PREFIXEXP args
-		| PREFIXEXP COLON NAME args 
+functioncall: prefixexp args
+		| prefixexp COLON NAME args 
 		;
 
 funcbody: OPB parlist CPB BLOCK END 
 		| OPB CPB BLOCK END 
 		;
 
-parlist	: NAMELIST 
-		| NAMELIST COMMA TDOT 
+parlist	: namelist 
+		| namelist COMMA TDOT 
 		| TDOT 
 		;
 
 args	: OPB CPB 
-		| OPB EXPLIST CPB 
+		| OPB explist CPB 
         | tableconstructor 
 		| string 
 		;
@@ -137,9 +137,9 @@ tableconstructor: OCB fieldlist CCB
 		| OCB CCB 
 		;
 
-field	: OSB EXP CSB ASSIGN EXP 
-		| NAME ASSIGN EXP 
-		| EXP 
+field	: OSB exp CSB ASSIGN exp 
+		| NAME ASSIGN exp 
+		| exp 
 	  	;
 
 fieldlist: fieldlist2 optfieldsep 
@@ -209,7 +209,7 @@ op_8    : op_8 POWER op_9
         | op_9 
         ;
 
-op_9    : EXP
+op_9    : exp
         ;
 
 %%
