@@ -65,21 +65,6 @@ true									{printf("true %s \n", yytext); insertUtil(newToken(yytext,1)); retu
 [A-Za-z_][A-Za-z0-9_]*					{printf("name %s \n",yytext); insertUtil(newToken(yytext,2)); return NAME; }
 [A-Za-z_][A-Za-z0-9_]*/"("					{printf("name %s \n",yytext); insertUtil(newToken(yytext,14)); return NAME; }
 
-
-=										{printf("\nassign %s",yytext); return ASSIGN; }
-\.										{printf("\ndot %s",yytext); return DOT; }
-:										{printf("\ncolon %s",yytext); return COLON; }
-,										{printf("\ncomma %s",yytext); return COMMA; }
-;										{printf("\nsemicolon %s",yytext); return SEMICOLON; }
-
-
-\(										{printf("\nopening parentheses %s",yytext); return OPB; }
-\)										{printf("\nclosing parentheses %s",yytext); return CPB; }
-\{										{printf("\nopening braces %s", yytext); return OCB; }
-\}										{printf("\nclosing braces %s", yytext); return CCB; }
-[\[]									{printf("\nopening sqbracket %s",yytext); return OSB; }
-[\]]									{printf("\nclosing sqbracket %s",yytext); return CSB; }
-
 [ \t]									{ /* spacing */}
 [\n]									{ linenr++; insertUtil(newToken(yytext,16));}
 
