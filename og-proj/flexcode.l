@@ -63,10 +63,26 @@ true									{printf("true %s \n", yytext); insertUtil(newToken(yytext,1)); retu
 \"[^\"]*\"								{printf("string %s \n",yytext); insertUtil(newToken(yytext,9)); return STRING;}
 \.\.\.									{printf("tdot %s \n",yytext); return TDOT;}
 [A-Za-z_][A-Za-z0-9_]*					{printf("name %s \n",yytext); insertUtil(newToken(yytext,2)); return NAME; }
-[A-Za-z_][A-Za-z0-9_]*/"("					{printf("name %s \n",yytext); insertUtil(newToken(yytext,14)); return NAME; }
+[A-Za-z_][A-Za-z0-9_.]*/[ ]*"("					{printf("name %s \n",yytext); insertUtil(newToken(yytext,14)); return NAME; }
+
+
+=										{printf("\nassign %s",yytext); return ASSIGN; }
+\.										{printf("\ndot %s",yytext); return DOT; }
+:										{printf("\ncolon %s",yytext); return COLON; }
+,										{printf("\ncomma %s",yytext); return COMMA; }
+;										{printf("\nsemicolon %s",yytext); return SEMICOLON; }
+
+
+\(										{printf("\nopening parentheses %s",yytext);insertUtil(newToken(yytext,12));  return OPB; }
+\)										{printf("\nclosing parentheses %s",yytext); insertUtil(newToken(yytext,12)); return CPB; }
+\{										{printf("\nopening braces %s", yytext); insertUtil(newToken(yytext,12)); return OCB; }
+\}										{printf("\nclosing braces %s", yytext); insertUtil(newToken(yytext,12)); return CCB; }
+[\[]									{printf("\nopening sqbracket %s",yytext); insertUtil(newToken(yytext,12)); return OSB; }
+[\]]									{printf("\nclosing sqbracket %s",yytext); insertUtil(newToken(yytext,12)); return CSB; }
 
 [ \t]									{ /* spacing */}
 [\n]									{ linenr++; insertUtil(newToken(yytext,16));}
+. {}
 
 %%
 //<<EOF>>                 				{printf("end %s \n", ""); return EXIT; }

@@ -61,10 +61,10 @@ void Display()
         struct ListElement* cur = TABLE[i];
         while(cur!=NULL)
         {
-            printf("%d-%s-%c%d-%d-",HASH(cur->t.name,0),cur->t.name,cur->scope,cur->scope_counter,cur->argcount);
+            printf("%d-%s-%s-%c%d-%d-",HASH(cur->t.name,0),cur->t.name,cur->type,cur->scope,cur->scope_counter,cur->argcount);
             if(cur->argcount>0)
-                printf("%d",cur->args[1]);
-            for(int i=2;i<cur->argcount+1;i++)
+                printf("%d",cur->args[0]);
+            for(int i=1;i<cur->argcount;i++)
                 printf(",%d",cur->args[i]);
             printf("\n"); 
 
@@ -75,7 +75,6 @@ void Display()
 
 int SEARCH(char* str,int scope_counter)
 {
-
     for(int i=0;i<TableLength;i++)
     {
         struct ListElement* cur = TABLE[i];
@@ -97,7 +96,7 @@ int SEARCH(char* str,int scope_counter)
 
 void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int scope_counter)
 {
-    printf("trying to insert %s with scope %c and scope counter %d\n",tk.name,scope,scope_counter); 
+    printf("trying to insert %s with scope %c and scope counter %d and type %s \n",tk.name,scope,scope_counter,type); 
 
     if(scope=='\0')
     {
@@ -120,16 +119,17 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
     struct ListElement* cur= (struct ListElement*)malloc(sizeof(struct ListElement));
     cur->t=tk;
     cur->scope=scope; 
+    strcpy(cur->type,type); 
     cur->argcount=argcount;
-    //if(scope=='L')
+    if(scope=='L')
     cur->scope_counter=scope_counter; 
-    //else 
-    //cur->scope_counter=0; 
+    else 
+    cur->scope_counter=0; 
     cur->next=NULL; 
-    for(int i=1;i<argcount+1;i++)
+    for(int i=0;i<argcount;i++)
     {
         cur->args[i]=args[i];
-        //        printf("arg[%d] is %d\n",i,args[i]); 
+                printf("arg[%d] is %d\n",i,args[i]); 
 
     }
     if(TABLE[val]==NULL)
@@ -149,23 +149,33 @@ int argcount=0;
 int lFlag=0; 
 char scope='G'; 
 int args[10]; 
-char temp[100]; 
 int idFlag=0; 
-char type="var"; 
+char type[10]="var"; 
+Token temp; 
+int argflag=0; 
 
 void insertUtil(Token t)
 {
     printf("lexeme name is %s and type is %d  \n ",t.name,t.type); 
-    if(t.type==2)
+    if((t.type==2|| t.type==14) && argflag!=1)
     {
-        strcpy(temp,t.name); 
+        strcpy(temp.name,t.name); 
     }
+
     if(strcmp(t.name,"local")==0)
     {
         lFlag=1; 
         scope='L'; 
     }
+
     if(t.type==16 || strcmp(t.name,";")==0)
+    {
+        scope='G'; 
+    }
+    if(funcFlag==1 && strcmp(t.name,"(")==0)
+    {
+        argflag=1; 
+    }
 
     if(strcmp(t.name,"function")==0)
     {
@@ -178,12 +188,23 @@ void insertUtil(Token t)
     }
     if(t.type==2 && funcFlag==1)
     {
-        strcpy(
-        
+        //strcpy(args[argcount++],t.name);
+        printf("for func name %s argument found %s \n",temp.name,t.name); 
+        if(scope_counter==0)
+        args[argcount++]=HASH(t.name,scope_counter); 
+        else
+        args[argcount++]=HASH(t.name,scope_counter-1); 
+        printf("args[] value is %d \n",args[0]); 
     }
     if(strcmp(t.name,")")==0 && funcFlag==1)
     {
         //insert
+        INSERT(temp,"func",scope,argcount,args,scope_counter); 
+        argcount=0; 
+        funcFlag=0;
+        argflag=0; 
+        return; 
+
     }
 
     if(strcmp(t.name,"repeat")==0| strcmp(t.name,"do")==0| strcmp(t.name,"then")==0| strcmp(t.name,"else")==0)
@@ -203,12 +224,13 @@ void insertUtil(Token t)
     if(t.type==2)
     {
         idFlag=1; 
-        INSERT(t,scope,argcount,args,scope_counter); 
+        if((argflag==0 && funcFlag==0) || (argflag==1 && funcFlag==1))
+        INSERT(t,"var",scope,0,args,scope_counter); 
     }
 
-    if(t.type==14)
+    if(t.type==14 && funcFlag!=1)
     {
-        INSERT(t,scope,0,0,scope_counter); 
+        INSERT(t,"func call",' ',0,0,scope_counter); 
     }
     
 }
