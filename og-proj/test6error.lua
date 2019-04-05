@@ -1,11 +1,11 @@
 function fibonacci(n)
     if n<3 then
-        return 1
+        return 1; 
     else
         return fibonacci(n-1) + fibonacci(n-2)
     end
 end
-function fibonacci1
+function fibonacci1(n)
     if n<3 then
         return 1
     else

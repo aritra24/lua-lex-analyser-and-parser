@@ -52,6 +52,26 @@ void Initialize()
     for(int i=0;i<TableLength;i++)
         TABLE[i]=NULL;
 }
+void SymbolTableDisplay()
+{
+for(int i=0;i<TableLength;i++)
+    {
+        struct ListElement* cur = TABLE[i];
+        while(cur!=NULL)
+        {
+            printf("%d-%d-%s-%s-%c%d-%d-",i,HASH(cur->t.name,cur->scope_counter),cur->t.name,cur->type,cur->scope,cur->scope_counter,cur->argcount);
+            if(cur->argcount>0)
+                printf("%d",cur->args[0]);
+            for(int i=1;i<cur->argcount;i++)
+                printf(",%d",cur->args[i]);
+            printf("--->"); 
+
+            cur=cur->next; 
+        }
+        printf("\n"); 
+    }
+
+}
 
 void Display()
 {
@@ -61,7 +81,7 @@ void Display()
         struct ListElement* cur = TABLE[i];
         while(cur!=NULL)
         {
-            printf("%d-%s-%s-%c%d-%d-",HASH(cur->t.name,0),cur->t.name,cur->type,cur->scope,cur->scope_counter,cur->argcount);
+            printf("%d-%s-%s-%c%d-%d-",HASH(cur->t.name,cur->scope_counter),cur->t.name,cur->type,cur->scope,cur->scope_counter,cur->argcount);
             if(cur->argcount>0)
                 printf("%d",cur->args[0]);
             for(int i=1;i<cur->argcount;i++)
@@ -75,21 +95,33 @@ void Display()
 
 int SEARCH(char* str,int scope_counter)
 {
-    for(int i=0;i<TableLength;i++)
-    {
-        struct ListElement* cur = TABLE[i];
+   // SymbolTableDisplay(); 
+   // for(int i=0;i<TableLength;i++)
+   // {
+       // struct ListElement* cur = TABLE[i];
+//       printf("i is %d\n",HASH(str,scope_counter)); 
+        struct ListElement* cur = TABLE[HASH(str,scope_counter)];
+ //       printf("cur->name and hash is \n",cur->t.name,HASH(str,scope_counter)); 
+        if(cur==NULL) {
+            printf("cur is null\n"); 
+        }
+
+
         while(cur!=NULL)
         {
-            //printf("inside search function %s and scope counter %d  \n",str,scope_counter); 
+           // printf("inside search function %s and scope counter %d  \n",str,scope_counter); 
+
+//            printf("current name  %s and scopecounter %d and  str %s and scope counter %d ",cur->t.name,cur->scope_counter,str,scope_counter);
             if(strcmp(cur->t.name,str)==0 && scope_counter==cur->scope_counter)
             {
-                //printf("name found %s \n",cur->t.name);
+                printf("found var %s \n",cur->t.name);
                 return 1; 
 
             }
             cur=cur->next; 
+            printf("\n");
         }
-    }
+   // }
     return 0; 
 }
 
@@ -110,12 +142,11 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
     else
     {
     //printf("global \n",tk.name); 
-    if(SEARCH(tk.name,0)==1) return; 
+        if(SEARCH(tk.name,0)==1) return; 
 
     }
     //if(SEARCH(tk.name,scope_counter)==1) return; 
 
-    int val=HASH(tk.name,scope_counter);
     struct ListElement* cur= (struct ListElement*)malloc(sizeof(struct ListElement));
     cur->t=tk;
     cur->scope=scope; 
@@ -125,6 +156,7 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
     cur->scope_counter=scope_counter; 
     else 
     cur->scope_counter=0; 
+    int val=HASH(tk.name,cur->scope_counter);
     cur->next=NULL; 
     for(int i=0;i<argcount;i++)
     {
@@ -132,6 +164,7 @@ void INSERT(struct token tk,char type[],char scope,int argcount,int args[],int s
                 //printf("arg[%d] is %d\n",i,args[i]); 
 
     }
+    //printf("inserting into location val %d\n",val); 
     if(TABLE[val]==NULL)
         TABLE[val]=cur;
     else

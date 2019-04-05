@@ -21,7 +21,7 @@ while									{ printf("while %s \n", yytext); insertUtil(newToken(yytext,1)); r
 for										{printf("for %s \n", yytext); insertUtil(newToken(yytext,1)); return FOR; }
 until									{printf("until %s \n", yytext); insertUtil(newToken(yytext,1)); return UNTIL; }
 repeat									{printf("repeat %s \n", yytext); insertUtil(newToken(yytext,1)); return REPEAT; }
-end										{printf(" END%s \n", yytext); insertUtil(newToken(yytext,1)); return END; }
+end										{printf(" END %s \n", yytext); insertUtil(newToken(yytext,1)); return END; }
 in										{printf("in %s \n", yytext); insertUtil(newToken(yytext,1)); return IN; }
 if										{printf("if %s \n", yytext); insertUtil(newToken(yytext,1)); return IF; }
 then									{printf("then %s \n", yytext); insertUtil(newToken(yytext,1)); return THEN; }
@@ -83,7 +83,7 @@ true									{printf("true %s \n", yytext); insertUtil(newToken(yytext,1)); retu
 [ \t]									{ /* spacing */}
 [\n]									{ linenr++; insertUtil(newToken(yytext,16));}
 <<EOF>>                 				{printf("end %s \n", ""); Display(); return EXIT; }
-. {}
+. {printf("other chars%s \n", yytext); }
 
 %%
 void yyerror(const char *str)

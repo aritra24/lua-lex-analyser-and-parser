@@ -254,7 +254,7 @@ opnd9: exp
 
 int main()
 {
-     yyin = fopen("test6.lua", "r");
+     yyin = fopen("test6error.lua", "r");
     do{
         if(yyparse())
         {
